@@ -3,7 +3,7 @@
 ## Getting started
 ```bush
 # 法规知识图谱前后端分离之前端部分
-# clone the project
+# github地址
 git clone https://github.com/GMYL/kg-web.git
 
 // install dependencies
