@@ -1,0 +1,533 @@
+<template>
+    <div>
+        <Row>
+            <i-col span="19" style="padding-right: 12px;">
+                <Card :bordered="false" dis-hover>
+                    <div class="word-graph-div" :style="graphDivStyle" v-if="showGraph">
+                        <word-Graph v-if="showGraph"
+                                    :wordlist="wordlist"
+                                    :closemodal.sync="showGraph"
+                                    :freshGraph.sync="freshGraph"
+                                    :picknode.sync="pickNode"
+                                    :picklink.sync="pickLink"/>
+                    </div>
+                </Card>
+            </i-col>
+            <i-col span="5" style="padding-right: 12px;">
+                <Card :bordered="false" dis-hover>
+                    <Tabs value="tabNodeUpdate" size="small">
+                        <TabPane label="修改节点" name="tabNodeUpdate">
+                            <Form :label-width="50">
+                                <FormItem label="编号" v-show="false">
+                                    <i-input v-model="pickNode.id" disabled/>
+                                </FormItem>
+                                <FormItem label="词名">
+                                    <i-input v-model="pickNode.word" disabled/>
+                                </FormItem>
+                                <FormItem label="权重">
+                                    <InputNumber :max="3" :min="0" :step="0.1" v-model="pickNode.weight"></InputNumber>
+                                    <!--<Slider v-model="pickNode.weight" :min="0" :max="3" :step="0.1"></Slider>-->
+                                    <!--<i-input v-model="pickNode.weight"/>-->
+                                </FormItem>
+                                <FormItem label="词性">
+                                    <i-input v-model="pickNode.nature"/>
+                                </FormItem>
+                                <FormItem label="操作">
+                                    <Button type="success" @click="submitNodeUpdate">
+                                        提交修改
+                                    </Button>
+                                    <Button type="error" @click="deleteNode">
+                                        删除节点
+                                    </Button>
+                                    <Button type="error" @click="deleteAllLinkByNode">
+                                        删除所有边
+                                    </Button>
+                                    <Button type="primary" @click="handleAllRelateLinks">
+                                        处理连线
+                                    </Button>
+                                </FormItem>
+                            </Form>
+                        </TabPane>
+                        <TabPane label="新建节点" name="tabNodeAdd">
+                            <Form :label-width="50">
+                                <FormItem label="词名">
+                                    <i-input v-model="addNode.word"/>
+                                </FormItem>
+                                <FormItem label="权重">
+                                    <InputNumber :max="3" :min="0" :step="0.1" v-model="addNode.weight"></InputNumber>
+                                    <!--<i-input v-model="addNode.weight"/>-->
+                                </FormItem>
+                                <FormItem label="词性">
+                                    <i-input v-model="addNode.nature"/>
+                                </FormItem>
+                                <FormItem label="操作">
+                                    <Button type="success" @click="submitNodeAdd">
+                                        新增
+                                    </Button>
+                                    <Button type="warning" @click="clearNodeAdd">
+                                        清空
+                                    </Button>
+                                </FormItem>
+                            </Form>
+                        </TabPane>
+                        <TabPane label="帮助" name="tabNodeHelp">
+                            <Alert>如果对应该名称的节点不要了，请删掉该节点并重建，不要修改这个节点的词名</Alert>
+                            <Alert>单词节点的id号和节点名称一致</Alert>
+                            <Alert type="success">ncs是税法相关的最特殊节点</Alert>
+                        </TabPane>
+                    </Tabs>
+                </Card>
+                <Card :bordered="false" style="margin-top:10px;" dis-hover>
+                    <Tabs value="tabLinkUpdate" size="small">
+                        <TabPane label="修改连线" name="tabLinkUpdate">
+                            <Form :label-width="50">
+                                <FormItem label="编号" v-show="false">
+                                    <i-input v-model="pickLink.id" disabled/>
+                                </FormItem>
+                                <FormItem label="起点">
+                                    <i-input v-model="pickLink.start" disabled/>
+                                </FormItem>
+                                <FormItem label="终点">
+                                    <i-input v-model="pickLink.end" disabled/>
+                                </FormItem>
+                                <FormItem label="权重">
+                                    <InputNumber :max="2" :min="0" :step="0.1" v-model="pickLink.weight"></InputNumber>
+                                    <!--<i-input v-model="pickLink.weight"/>-->
+                                </FormItem>
+                                <FormItem label="注解">
+                                    <i-input v-model="pickLink.tip"/>
+                                </FormItem>
+                                <FormItem label="类型">
+                                    <Row>
+                                        <i-col span="8">
+                                            <i-select v-model="pickLink.type">
+                                                <Option value="synonym">近义关系</Option>
+                                                <Option value="parent">父子关系</Option>
+                                            </i-select>
+                                        </i-col>
+                                        <i-col span="12" style="margin-left: 5px;">
+                                            <RadioGroup v-model="pickLink.type">
+                                                <Radio label="synonym"></Radio>
+                                                <Radio label="parent"></Radio>
+                                            </RadioGroup>
+                                        </i-col>
+                                    </Row>
+                                </FormItem>
+                                <FormItem label="操作">
+                                    <Button type="success" @click="submitLinkUpdate">
+                                        提交修改
+                                    </Button>
+                                    <Button type="error" @click="deleteLink">
+                                        删除连线
+                                    </Button>
+                                    <Button type="primary" @click="reverseLink">
+                                        转置连线
+                                    </Button>
+                                </FormItem>
+                            </Form>
+                        </TabPane>
+                        <TabPane label="新建连线" name="tabLinkAdd">
+                            <Form :label-width="50">
+                                <FormItem label="起点">
+                                    <i-input v-model="addLink.start"/>
+                                </FormItem>
+                                <FormItem label="终点">
+                                    <i-input v-model="addLink.end"/>
+                                </FormItem>
+                                <FormItem label="权重">
+                                    <InputNumber :max="2" :min="0" :step="0.1" v-model="addLink.weight"></InputNumber>
+                                    <!--<i-input v-model="addLink.weight"/>-->
+                                </FormItem>
+                                <FormItem label="注解">
+                                    <i-input v-model="addLink.tip"/>
+                                </FormItem>
+                                <FormItem label="类型">
+                                    <Row>
+                                        <i-col span="8">
+                                            <i-select v-model="addLink.type">
+                                                <Option value="synonym">近义关系</Option>
+                                                <Option value="parent">父子关系</Option>
+                                            </i-select>
+                                        </i-col>
+                                        <i-col span="12" style="margin-left: 5px;">
+                                            <RadioGroup v-model="addLink.type">
+                                                <Radio label="synonym"></Radio>
+                                                <Radio label="parent"></Radio>
+                                            </RadioGroup>
+                                        </i-col>
+                                    </Row>
+                                </FormItem>
+                                <FormItem label="操作">
+                                    <Button type="success" @click="submitLinkAdd">
+                                        新增
+                                    </Button>
+                                    <Button type="error" @click="clearLink">
+                                        清空
+                                    </Button>
+                                </FormItem>
+                            </Form>
+                        </TabPane>
+                        <TabPane label="其它操作" name="otherHandler">
+                            <Form :label-width="50">
+                                <FormItem label="添加词">
+                                    <i-input v-model="toDeleteLinkNode" @on-enter="handleAddWordToDelete">
+                                        <Button slot="append" @click="handleAddWordToDelete">
+                                            添加
+                                        </Button>
+                                    </i-input>
+                                </FormItem>
+                                <FormItem label="被选词">
+                                    <Tag v-for="item in toDeleteLinkNodeList" :key="item" :name="item" type="dot"
+                                         color="red"
+                                         closable
+                                         @on-close="handleWordCloseToDelete">{{ item }}
+                                    </Tag>
+                                </FormItem>
+                                <FormItem label="操作">
+                                    <Button type="error" @click="deleteAllRelateLinks">
+                                        删除这些节点对应的所有边
+                                    </Button>
+                                    <Button type="warning" @click="clearPickedWordToDelete">
+                                        清空
+                                    </Button>
+                                </FormItem>
+                            </Form>
+                        </TabPane>
+                        <TabPane label="帮助" name="tabLinkHelp">
+                            <Alert>节点的编号是根据首尾节点自动生成的</Alert>
+                            <Alert>如果该连线不要了，请删掉该连线，不要修改这个连线的起点和终点</Alert>
+                            <Alert type="warning">两个点之间关系只能有一种，要么父子、要么近义</Alert>
+                            <Alert>父子关系是父指向子，近义关系没有方向</Alert>
+                        </TabPane>
+                    </Tabs>
+                </Card>
+                <Card :bordered="false" style="margin-top:10px;" dis-hover>
+                    <p slot="title">
+                        <Icon type="ios-list-outline"></Icon>
+                        显示
+                    </p>
+                    <Button slot="extra" type="success" shape="circle" @click="showGraphClick">
+                        显示
+                    </Button>
+                    <Button slot="extra" type="warning" shape="circle" @click="clearPickedWord">
+                        清空
+                    </Button>
+                    <Button slot="extra" type="error" shape="circle" @click="mergeGraphToDictionary">
+                        更新问答库
+                    </Button>
+                    <Form :label-width="50">
+                        <FormItem label="导入" v-show="showRestoreProgress">
+                            <Progress :percent="restoreProgress" status="active"></Progress>
+                        </FormItem>
+                        <FormItem label="问答">
+                            <i-input v-model="questioninput" @on-enter="handleAddQuestion">
+                                <Button slot="append" @click="handleAddQuestion">
+                                    提交
+                                </Button>
+                            </i-input>
+                            <i-input type="text" style="display:none"/>
+                        </FormItem>
+                        <FormItem label="添加词">
+                            <i-input v-model="wordinput" @on-enter="handleAddWord">
+                                <Button slot="append" @click="handleAddWord">
+                                    添加
+                                </Button>
+                            </i-input>
+                        </FormItem>
+                        <FormItem label="被选词">
+                            <Tag v-for="item in wordlist" :key="item" :name="item" type="dot" color="green"
+                                 closable
+                                 @on-close="handleWordClose">{{ item }}
+                            </Tag>
+                        </FormItem>
+                    </Form>
+                </Card>
+            </i-col>
+        </Row>
+        <!-- 修改所选节点对应的边 -->
+        <Modal v-model="showWordLinkTable" width="800">
+            <wordLinkTable :mainnode="pickNode"
+                           :closemodal.sync="showWordLinkTable"
+                           style="margin-top: 20px;margin-right: 15px;margin-left: 15px;">
+            </wordLinkTable>
+            <div slot="footer">
+            </div>
+        </Modal>
+    </div>
+</template>
+<script>
+  import wordGraph from '../components/word-graph';
+  import wordLinkTable from '../components/word-link-table';
+  import ICol from "iview/src/components/grid/col";
+
+  export default {
+    components: {
+      ICol,
+      wordGraph,
+      wordLinkTable
+    },
+    data() {
+      return {
+        wordlist: ['F0396', 'I0186','F0519'],
+        wordinput: '',
+        questioninput: '',
+        pickNode: {},
+        pickLink: {
+          start: '',
+          end: ''
+        },
+        addNode: {
+          word: '',
+          weight: 1.0,
+          nature: ''
+        },
+        addLink: {
+          start: '',
+          end: '',
+          weight: 0.3,
+          tip: '',
+          type: 'synonym'
+        },
+        toDeleteLinkNode: '',
+        toDeleteLinkNodeList: [],
+        showGraph: true,
+        freshGraph: 0,
+        showWordLinkTable: false,
+        showRestoreProgress: false,
+        restoreProgress: 0
+      };
+    },
+    methods: {
+      clearPickedWord() {
+        this.wordlist = [];
+      },
+      handleAddWord() {
+        this.wordlist.push(this.wordinput);
+        this.wordinput = '';
+      },
+      handleAddQuestion() {
+        this.$http.get('/dict/termAnalysis', {params: {question: this.questioninput, expand: false}}).then(res => {
+          this.wordlist = res.map(word => word.name);
+          this.$Notice.success({
+            title: '已获取最新数据'
+          });
+        });
+      },
+      handleWordClose(event, name) {
+        const index = this.wordlist.indexOf(name);
+        this.wordlist.splice(index, 1);
+      },
+      showGraphClick() {
+        this.freshGraph++;
+      },
+      submitNodeUpdate() {
+        this.$http.post('/wizard/node/update', this.pickNode).then(() => {
+          this.$Notice.success({
+            title: '修改成功',
+          });
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '修改失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      submitNodeAdd() {
+        this.$http.put('/wizard/node', this.addNode).then(() => {
+          this.$Notice.success({
+            title: '新增节点成功',
+          });
+          this.wordlist.push(this.addNode.word);
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '新增失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      deleteNode() {
+        this.$http.delete('/wizard/node/' + this.pickNode.id).then(() => {
+          this.$Notice.success({
+            title: '删除成功',
+          });
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '删除失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      deleteAllLinkByNode() {
+        // 删除一个节点对应的所有边，但保留这一节点
+        this.$http.delete('/wizard/node/deleteAllLinkByNode', {params: {id: this.pickNode.id}}).then(() => {
+          this.$Notice.success({
+            title: '删除成功',
+          });
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '删除失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      handleAllRelateLinks() {
+        // 处理该节点相关的所有连线
+        this.showWordLinkTable = true;
+      },
+      clearNodeAdd() {
+        this.addNode = {
+          word: '',
+          weight: '',
+          nature: ''
+        };
+      },
+      submitLinkUpdate() {
+        this.$http.post('/wizard/link/update', this.pickLink).then(() => {
+          this.$Notice.success({
+            title: '修改成功',
+          });
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '修改失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      submitLinkAdd() {
+        this.$http.put('/wizard/link', this.addLink).then(() => {
+          this.$Notice.success({
+            title: '新增连线成功',
+          });
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '新增失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      deleteLink() {
+        this.$http.delete('/wizard/link/' + this.pickLink.id).then(() => {
+          this.$Notice.success({
+            title: '删除成功',
+          });
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '删除失败',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      clearLink() {
+        this.addLink = {
+          start: '',
+          end: '',
+          weight: 1.0,
+          tip: '',
+          type: 'synonym'
+        };
+      },
+      reverseLink() {
+        this.$http.get('/wizard/link/reverseLink/' + this.pickLink.id).then((res) => {
+          this.$Notice.success({
+            title: '转置成功',
+            desc: res
+          });
+          this.pickLink = res;
+          this.freshGraph++;
+        }, err => {
+          this.$Notice.error({
+            title: '转置成功',
+            desc: err.errMsg ? err.errMsg : err
+          });
+        });
+      },
+      clearPickedWordToDelete() {
+        this.toDeleteLinkNodeList = [];
+      },
+      handleAddWordToDelete() {
+        this.toDeleteLinkNodeList.push(this.toDeleteLinkNode);
+        this.toDeleteLinkNode = '';
+      },
+      handleWordCloseToDelete(event, name) {
+        const index = this.toDeleteLinkNodeList.indexOf(name);
+        this.toDeleteLinkNodeList.splice(index, 1);
+      },
+      deleteAllRelateLinks() {
+        this.$http.post('/wizard/link/deleteAllRelateLinks', this.toDeleteLinkNodeList).then(res => {
+          this.$Notice.success({
+            title: '删除所选的这些节点之间的所有边成功',
+            content: res
+          });
+          this.freshGraph++;
+        });
+      },
+      checkRestoreProgress() {
+        setTimeout(() => {
+          this.$http.get('/wizard/node/getRestoreProgress').then(res => {
+            this.restoreProgress = res;
+            if (res === 100) {
+              setTimeout(() => {
+                this.showRestoreProgress = false;
+              }, 10000);
+            } else {
+              this.checkRestoreProgress();
+            }
+          });
+        }, 1000);
+      },
+      mergeGraphToDictionary() {
+        this.$Modal.confirm({
+          title: "请确认更新问答词库",
+          content: "该过程会清空现有所有在问答词库下的配置重新生成，该过程也会更新智能问答权重词典，生成过程大概需要30秒左右，生成完毕后会有提示，过程中请不要再次点击，确认生成请点击确认",
+          okText: '确认',
+          cancelText: '取消',
+          onOk: () => {
+            this.showRestoreProgress = true;
+            this.checkRestoreProgress();
+            this.$http.get('/wizard/node/man/restoreAllWordsToRobotDictionary', {params: {clearAll: true}}).then(res => {
+              this.$Message.success({
+                content: '更新完毕' + res,
+                duration: 10
+              });
+            });
+          },
+          onCancel: () => {
+            this.$Modal.remove();
+          }
+        });
+      }
+    },
+    computed: {
+      graphDivStyle: function () {
+        console.log(window.innerHeight);
+        return {
+          height: (window.innerHeight - 120) + 'px'
+        };
+      }
+    },
+    watch: {
+      showWordLinkTable(newVal, oldVal) {
+        if (oldVal && (!newVal)) {
+          this.showGraphClick();
+        }
+      },
+      pickNode(newVal, oldVal) {
+        this.toDeleteLinkNode = newVal.id;
+      }
+    },
+    created() {
+      this.$nextTick(() => {
+        this.showGraphClick();
+      });
+    },
+    mounted() {
+    }
+  };
+</script>

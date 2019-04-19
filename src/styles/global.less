@@ -1,0 +1,32 @@
+// 全局样式
+
+.container{
+  max-width: 1200px;
+  margin:0 auto;
+  padding:1em 0;
+}
+
+.pageTool {
+  padding: 1em;
+  text-align: right;
+}
+.filterTool {
+  .toolBar {
+    height: 60px;
+    .label {
+      width: 100px;
+      display: inline-block;
+      text-align: right;
+      padding: 0 1em;
+    }
+  }
+}
+
+.demo-spin-icon-load{
+  animation: ani-demo-spin 1s linear infinite;
+}
+@keyframes ani-demo-spin {
+  from { transform: rotate(0deg);}
+  50%  { transform: rotate(180deg);}
+  to   { transform: rotate(360deg);}
+}
