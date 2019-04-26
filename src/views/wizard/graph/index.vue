@@ -21,16 +21,14 @@
                                 <FormItem label="编号" v-show="false">
                                     <i-input v-model="pickNode.id" disabled/>
                                 </FormItem>
-                                <FormItem label="词名">
+                                <FormItem label="实体">
                                     <i-input v-model="pickNode.word" disabled/>
                                 </FormItem>
                                 <FormItem label="权重">
                                     <InputNumber :max="3" :min="0" :step="0.1" v-model="pickNode.weight"></InputNumber>
-                                    <!--<Slider v-model="pickNode.weight" :min="0" :max="3" :step="0.1"></Slider>-->
-                                    <!--<i-input v-model="pickNode.weight"/>-->
                                 </FormItem>
-                                <FormItem label="词性">
-                                    <i-input v-model="pickNode.nature"/>
+                                <FormItem label="属性">
+                                    <i-input v-model="pickNode.nature" disabled/>
                                 </FormItem>
                                 <FormItem label="操作">
                                     <Button type="success" @click="submitNodeUpdate">
@@ -50,14 +48,13 @@
                         </TabPane>
                         <TabPane label="新建节点" name="tabNodeAdd">
                             <Form :label-width="50">
-                                <FormItem label="词名">
+                                <FormItem label="实体">
                                     <i-input v-model="addNode.word"/>
                                 </FormItem>
                                 <FormItem label="权重">
                                     <InputNumber :max="3" :min="0" :step="0.1" v-model="addNode.weight"></InputNumber>
-                                    <!--<i-input v-model="addNode.weight"/>-->
                                 </FormItem>
-                                <FormItem label="词性">
+                                <FormItem label="属性">
                                     <i-input v-model="addNode.nature"/>
                                 </FormItem>
                                 <FormItem label="操作">
@@ -334,6 +331,7 @@
         });
       },
       submitNodeAdd() {
+        this.addNode.type = 'law'
         this.$http.put('/wizard/node', this.addNode).then(() => {
           this.$Notice.success({
             title: '新增节点成功',

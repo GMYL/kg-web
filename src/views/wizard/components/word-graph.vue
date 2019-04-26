@@ -28,6 +28,30 @@
                 fontSize: 20
               },
           },
+          tooltip: {
+            show : true,   //默认显示
+            showContent:true, //是否显示提示框浮层
+            trigger:'item',//触发类型，默认数据项触发
+            triggerOn:'click',//提示触发条件，mousemove鼠标移至触发，还有click点击触发
+            alwaysShowContent:false, //默认离开提示框区域隐藏，true为一直显示
+            showDelay:0,//浮层显示的延迟，单位为 ms，默认没有延迟，也不建议设置。在 triggerOn 为 'mousemove' 时有效。
+            hideDelay:200,//浮层隐藏的延迟，单位为 ms，在 alwaysShowContent 为 true 的时候无效。
+            enterable:false,//鼠标是否可进入提示框浮层中，默认为false，如需详情内交互，如添加链接，按钮，可设置为 true。
+            position:'right',//提示框浮层的位置，默认不设置时位置会跟随鼠标的位置。只在 trigger 为'item'的时候有效。
+            confine:false,//是否将 tooltip 框限制在图表的区域内。外层的 dom 被设置为 'overflow: hidden'，或者移动端窄屏，导致 tooltip 超出外界被截断时，此配置比较有用。
+            transitionDuration:0.4,//提示框浮层的移动动画过渡时间，单位是 s，设置为 0 的时候会紧跟着鼠标移动。
+            formatter: item => {
+                  return item ? item.name : '';
+                },
+            extraCssText:'background:red;white-space:pre-wrap'
+            
+          },
+          legend: [{
+            selectedMode: 'single',
+              // data: categories.map(function (a) {
+              //     return a.name;
+              // })
+          }],
           legend: {
             data: []
           },
@@ -48,18 +72,20 @@
           backgroundColor: 'rgba(196, 196, 196, 0.1)',
           series: [{
             type: 'graph',
+            // name : "法规知识图谱",  //系列名称，用于tooltip的显示，legend 的图例筛选，在 setOption 更新数据和配置项时用于指定对应的系列。
             layout: 'force',//力引导布局
             //  layout: 'circular',//环形布局
             animation: false,//是否开启动画。
             roam: true,//整体是否可拖动
-            // draggable: true,//节点是否可拖动
+            draggable: false,//节点是否可拖动
             focusNodeAdjacency: true,//关联节点高亮
             symbol: 'circle',
             label: {
               normal: {
                 show: true,
                 formatter: item => {
-                  return item ? item.name + '\n[' + item.data.nature + ']:' + item.value : '';
+                  return item ? item.name.substr(0, 13) + '\n[' + 'weight' + ']:' + item.value : '';
+                  // return item ? item.name + '\n[' + item.data.nature + ']:' + item.value : '';
                 },
                 textStyle: {
                   color: 'black',
@@ -69,7 +95,7 @@
                 }
               }
             },
-            categories: [],
+            categories: [],//图谱顶部的分类
             force: {//力引导布局
               //initLayout: 'circular',
               edgeLength: 160,
@@ -99,17 +125,34 @@
     methods: {
       switchColor: (nature) => {
         switch (nature) {
-          case 'ncs':
+          case '发文日期':
             return 'rgba(176,164,227, 0.9)';
-          case 'n':
+          case '法规编号':
             return 'rgba(158, 208, 72, 0.9)';
-          case 'v':
-          case 'vn':
+          case 'excelType':
             return 'rgba(68, 206, 246, 0.9)';
-          case 'a':
+          case '所属类别':
             return 'rgba(242, 190, 69, 0.8)';
+          case '标题':
+            return 'rgba(44, 154, 206, 0.94)';
           default:
             return 'rgba(161, 175, 201, 0.9)';
+        }
+      },
+      switchCategorie: (nature) => {
+        switch (nature) {
+          case 'date':
+            return '发文日期';
+          case 'lawId':
+            return '法规编号';
+          case 'excelType':
+            return '所属类别';
+          case 'name':
+            return '标题';
+          case 'no':
+            return '发文号';
+          default:
+            return '-';
         }
       },
       handlePick(params) {
@@ -142,7 +185,7 @@
               }
             }).then(res => {
               res.data.forEach(word => {
-                this.revNodes[word.id] = word;
+                this.revNodes[word.word] = word;
               });
               res.links.forEach(link => {
                 this.revLinks[link.id] = link;
@@ -176,21 +219,6 @@
           });
         }
       },
-      // getElevatorList(){
-      //   this.option.series[0].links[this.counter]=this.tempLinks[this.counter]
-      //   this.counter=this.counter+1
-      //   this.wordGraphShow.setOption(this.option);
-      //   console.log(this.counter+"-"+this.tempLinks.length)
-      //   console.log(this.timer)
-      //   if(this.counter==this.tempLinks.length){
-
-      //     this.timer.forEach((timer) => {clearTimeout(timer)})//关闭定时器
-      //     this.timer=[]
-      //     this.tempLinks=[];
-      //     this.counter=0
-      //     this.switch=false
-      //   }
-      // },
       generateGraph() {
         // 这个方法是只按照当前的点集展示图形
         this.option.series[0].data = [];
@@ -198,14 +226,15 @@
         let natureMap = {};
         for (let key in this.revNodes) {
           let word = this.revNodes[key];
-          natureMap[word.nature ? word.nature : '-'] = '';
+          natureMap[this.switchCategorie(word.nature)] = '';
           this.option.series[0].data.push({
-            srcid: word.id,
+            srcid: word.word,
             name: word.word,
             value: word.weight,
-            nature: word.nature ? word.nature : '-',
+            nature: this.switchCategorie(word.nature),
             symbolSize: word.weight * 10 + 30,
-            category: word.nature ? word.nature : '-'
+            // category: word.nature ? word.nature : '-',
+            category: this.switchCategorie(word.nature),
           });
         }
         for (let key in natureMap) {
@@ -222,7 +251,7 @@
         for (let key in this.revLinks) {
           let link = this.revLinks[key];
           switch (link.type) {
-            case 'synonym':
+            case 'attribute':
               link.symbol = null;
               link.symbolSize = null;
               link.lineStyle = {
@@ -230,10 +259,11 @@
                   color: 'rgba(255,33,33,' + link.weight / 0.6 + ')',
                   opacity: 0.9,
                   width: 2,
+                  // type:'dotted'  //线的类型可选：'solid' 'dashed' 'dotted'
                 }
               };
               break;
-            case 'parent':
+            case 'type':
               link.symbol = ['circle', 'arrow'];
               link.symbolSize = [3, 13];
               link.lineStyle = {
@@ -251,7 +281,7 @@
             srcid: link.id,
             source: link.start,
             target: link.end,
-            value: link.weight,
+            value: link.nature,
             label: {
               normal: {
                 show: true,
@@ -264,54 +294,10 @@
             lineStyle: link.lineStyle
           });
         }
-        // console.log("this.revLinks.length")
-        // if(this.tempLinks.length<10){
-        //   this.option.series[0].links=this.tempLinks;
-        //   this.tempLinks=[];
-        // }else{
-        //    console.log("timer:"+this.timer)
-        //    if(!this.switch){
-        //       this.switch=true
-        //       this.timer.push(setInterval(this.getElevatorList, 1000));
-        //       console.log("timer:"+this.timer)
-        //    }
-        // }
-        // // 所有点都需要和中心点建立联系
-        // let mainNode = {
-        //   name: '中心节点',
-        //   value: 1,
-        //   // x: 0,
-        //   // y: 0,
-        //   symbolSize: 0,
-        //   // fixed: true,
-        //   label: {
-        //     normal: {
-        //       show: false,
-        //     }
-        //   }
-        // };
-        // this.option.series[0].data.forEach(node => {
-        //   this.option.series[0].links.push({
-        //     source: mainNode.name,
-        //     target: node.name,
-        //     value: 0,
-        //     lineStyle: {
-        //       normal: {
-        //         opacity: 0.9,
-        //         width: 0
-        //       }
-        //     }
-        //   });
-        // });
-        // this.option.series[0].data.push(mainNode);
-        // 最后是展示图形
         console.log(JSON.stringify(this.option));
         console.log(this.option);
         this.wordGraphShow.setOption(this.option);
         window.onresize = this.wordGraphShow.resize;
-        // window.addEventListener('resize', function () {
-        //   this.wordGraphShow.resize();
-        // });
       },
     },
     mounted() {
@@ -323,24 +309,5 @@
       this.wordGraphShow.on('dblclick', this.handleExtend);
       this.showGraph();
     }
-//     ,
-//     destroyed(){
-//       console.log('销毁')
-
-      
-//       this.timer.forEach((timer) => {clearTimeout(timer)})//关闭定时器
-//       this.timer = []
-//       this.tempLinks=[];
-//       this.counter=0
-//       this.switch=false
-
-//       console.log('销毁成功')
-      
-//     },
-//     beforeDestroy() {
-//     if(this.timer) { //如果定时器还在运行 或者直接关闭，不用判断
-//         this.timer.forEach((timer) => {clearTimeout(timer)})//关闭定时器
-//     }
-// }
   };
 </script>

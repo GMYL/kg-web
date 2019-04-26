@@ -26,136 +26,44 @@
                 </i-col>
               </Row>
               <div class="line-gray"></div>
-              <Row class="margin-top-8">
-                <i-col span="8">
-                  <p class="notwrap">上次登录时间:</p>
-                </i-col>
-                <i-col span="16" class="padding-left-8">{{ userStatus.lastLoginData }}</i-col>
-              </Row>
-              <Row class="margin-top-8">
-                <i-col span="8">
-                  <p class="notwrap">上次登陆IP:</p>
-                </i-col>
-                <i-col span="16" class="padding-left-8">{{ userStatus.lastLoginIp }}</i-col>
-              </Row>
             </i-col>
           </Row>
         </i-col>
         <i-col :md="24" :lg="16">
-          <Row :gutter="5">
-            <!-- <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <a @click="goAllUser"  title="点击查看所有用户">
-                <infor-card
-                  id-name="user_sum_count"
-                  :end-val="count.sumUser"
-                  iconType="android-person-add"
-                  color="#2d8cf0"
-                  intro-text="用户总数"
-                ></infor-card>
-              </a>
-            </i-col> -->
-            <!-- <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <infor-card
-                id-name="user_created_count"
-                :end-val="count.createUser"
-                iconType="android-person-add"
-                color="#00C1DE"
-                intro-text="最近七天新增用户"
-              ></infor-card>
-            </i-col>
-            <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <infor-card
-                id-name="collection_count"
-                :end-val="count.loginUser"
-                iconType="android-person-add"
-                color="#ffd572"
-                intro-text="今日登录人数"
-              ></infor-card>
-            </i-col>
-            <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <a  title="10分钟更新一次">
-              <infor-card
-                id-name="visit_count"
-                :end-val="count.visit"
-                iconType="ios-eye"
-                color="#64d572"
-                :iconSize="50"
-                intro-text="今日服务调用量"
-              ></infor-card>
-              </a>
-            </i-col>
-            <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <a @click="goMyWork"  title="点击查看待我处理的业务">
-                <infor-card
-                  id-name="unfinishedWorkflow"
-                  :end-val="workflows.unfinishedWorkflow"
-                  iconType="android-document"
-                  color="#2d8cf0"
-                  :iconSize="50"
-                  intro-text="还未处理的业务"
-                ></infor-card>
-              </a>
-            </i-col>
-            <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <infor-card
-                id-name="finishedWorkflow"
-                :end-val="workflows.finishedWorkflow"
-                iconType="ios-folder"
-                color="#64d572"
-                :iconSize="50"
-                intro-text="已处理的业务"
-              ></infor-card>
-            </i-col>
-            <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <a @click="goMyQa" title="点击查看待我处理的问题">
-                <infor-card
-                  id-name="unfinishedQuestion"
-                  :end-val="workflows.unfinishedQuestion"
-                  iconType="chatbox"
-                  color="#2d8cf0"
-                  :iconSize="50"
-                  intro-text="还未处理的问题"
-                ></infor-card>
-              </a>
-            </i-col>
-            <i-col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
-              <infor-card
-                id-name="finishedQuestion"
-                :end-val="workflows.finishedQuestion"
-                iconType="chatbox-working"
-                color="#64d572"
-                :iconSize="50"
-                intro-text="已处理的问题"
-              ></infor-card>
-            </i-col> -->
-          </Row>
+            <Row class="margin-top-30">
+                <i-col span="8">
+                  <p class="notwrap">上次登录时间:</p>
+                </i-col>
+                <i-col span="16" class="padding-left-8">{{ userStatus.lastLoginData }}</i-col>
+            </Row>
+            <Row class="margin-top-30">
+                <i-col span="8">
+                  <p class="notwrap">上次登陆IP:</p>
+                </i-col>
+                <i-col span="16" class="padding-left-8">{{ userStatus.lastLoginIp }}</i-col>
+            </Row>
         </i-col>
       </Row>
       <Row class="margin-top-10">
-        <!-- <Card :bordered="false" :dis-hover="true">
-          <p slot="title" class="card-title">
-            <Icon type="ios-shuffle-strong"></Icon>7日服务调用量
-          </p>
-          <div v-if="showDayVisit" class="line-chart-con">
-            <service-requests :visit="dayVisit" divid="service_request_day" areacolor="#10A6FF"/>
-          </div>
-        </Card> -->
+        <Card :bordered="false"  dis-hover >
+              <div class="word-graph-div" style="height:800px" v-if="showGraph">
+                  <word-Graph v-if="showGraph"
+                              :wordlist="wordlist"
+                              :closemodal.sync="showGraph"
+                              :freshGraph.sync="freshGraph"
+                              :picknode.sync="pickNode"
+                              :picklink.sync="pickLink"/>
+              </div>
+        </Card>
       </Row>
       <Row class="margin-top-10">
-        <!-- <Card :bordered="false" :dis-hover="true">
-          <p slot="title" class="card-title">
-            <Icon type="ios-shuffle-strong"></Icon>24小时服务调用量
-          </p>
-          <div v-if="showHourVisit" class="line-chart-con">
-            <service-requests :visit="hourVisit" divid="service_request_hour" areacolor="#0C17A6"/>
-          </div>
-        </Card> -->
       </Row>
     </Card>
   </div>
 </template>
 
 <script>
+import wordGraph from '../wizard/components/word-graph';
 import inforCard from "./components/inforCard.vue";
 import { formatFullDate } from "@/libs/filters";
 import serviceRequests from "./components/serviceRequests.vue";
@@ -163,11 +71,20 @@ import serviceRequests from "./components/serviceRequests.vue";
 export default {
   name: "home",
   components: {
+    wordGraph,
     inforCard,
     serviceRequests
   },
   data() {
     return {
+      wordlist: ['F0396', 'I0186','F0519'],
+      showGraph: true,
+      freshGraph: 0,
+      pickNode: {},
+      pickLink: {
+          start: '',
+          end: ''
+        },
       count: {
         sumUser: 0,
         createUser: 0,
@@ -221,11 +138,6 @@ export default {
       }
     },
     getCount() {
-      // this.$http.get("/system/info/homecount").then(res => {
-      //   if (res) {
-      //     this.count = res;
-      //   }
-      // });
       this.$http.get("/user/lastLogin").then(res => {
         if (res) {
           this.userStatus = res;
@@ -234,40 +146,7 @@ export default {
             : "-";
         }
       });
-      // this.$http.get("/dictionary/belongToMe").then(res => {
-      //   if (res) {
-      //     this.workflows = res.data;
-      //   }
-      // });
-      // // 获取天级别的访问量
-      // let day1 = new Date();
-      // day1.setTime(day1.getTime() - 7 * 24 * 60 * 60 * 1000);
-      // let postDay = {
-      //   timeStart: day1,
-      //   period: "day"
-      // };
-      // this.$http.post("/system/visitstatus/period", postDay).then(res => {
-      //   if (res) {
-      //     this.dayVisit = res;
-      //     this.showDayVisit = true;
-      //   }
-      // });
-      // // 获取小时级的访问量
-      // let hour = new Date();
-      // hour.setTime(hour.getTime() - 24 * 60 * 60 * 1000);
-      // let postHour = {
-      //   timeStart: hour,
-      //   period: "hour"
-      // };
-      // this.$http.post("/system/visitstatus/period", postHour).then(res => {
-      //   if (res) {
-      //     this.hourVisit = res.map(item => {
-      //       item.id = item.id.substring(5);
-      //       return item;
-      //     });
-      //     this.showHourVisit = true;
-      //   }
-      // });
+      
     },
     goMyWork() {
       this.$router.push({ name: "work_solve" });
