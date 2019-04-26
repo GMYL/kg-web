@@ -4,7 +4,7 @@ import env from '../../build/env';
 const ajaxUrl = env === 'development'
   ? 'http://192.168.1.71:18070/kg/v1/b'
   : env === 'production'
-    ? 'http://www.helper12366.com/kg/v1/b'
+    ? 'http://www.aqielu.cn/kg/v1/b'
     : env === 'devlocal'
       ? 'http://localhost:18070/kg/v1/b'
       : 'http://192.168.1.71:18070/kg/v1/b';

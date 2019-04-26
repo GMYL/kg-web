@@ -19,7 +19,7 @@ fs.open('./build/env.js', 'w', function (err, fd) {
 
 module.exports = merge(webpackBaseConfig, {
   output: {
-    publicPath: 'http://www.helper12366.com/admin/static/',
+    publicPath: 'http://www.aqielu.cn/admin/static/',
     filename: '[name].[hash].js',
     chunkFilename: '[name].[hash].chunk.js'
   },

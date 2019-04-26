@@ -290,7 +290,7 @@ export default {
     created(){
         if (window.location.host == "192.168.1.71") {
             this.myConfig.UEDITOR_HOME_URL = "/admin/static/static/UEditor/";
-        } else if (window.location.host == "www.helper12366.com") {
+        } else if (window.location.host == "www.aqielu.cn") {
             this.myConfig.UEDITOR_HOME_URL = "/admin/static/static/UEditor/";
         } else {
             this.myConfig.UEDITOR_HOME_URL = "/src/static/UEditor/";

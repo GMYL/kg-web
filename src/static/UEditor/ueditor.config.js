@@ -21,7 +21,7 @@
      */
     // if(window.location.host == '192.168.1.71'){
         //window.UEDITOR_HOME_URL = '/admin/static/static/UEditor/';
-    // }else if(window.location.host == 'www.helper12366.com'){
+    // }else if(window.location.host == 'www.aqielu.cn'){
     //     window.UEDITOR_HOME_URL= '/admin/static/UEditor/';
     // }else{
     //     window.UEDITOR_HOME_URL = '/src/static/UEditor/';
