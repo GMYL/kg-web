@@ -5,6 +5,7 @@
 
 <script>
   import echarts from 'echarts';
+  import 'echarts-gl';
 
   export default {
     name: 'wordGraph',
@@ -14,13 +15,6 @@
         wordGraphShow: {},
         revNodes: {},
         revLinks: {},
-        lawId:'',
-        lawContents:'',
-        // timer: [],
-        // tempLinks: [],
-        // tempData: [],
-        // switch:false,
-        // counter:0,
         option: {
           title: {
             text: '知识图谱',
@@ -43,20 +37,14 @@
             confine:false,//是否将 tooltip 框限制在图表的区域内。外层的 dom 被设置为 'overflow: hidden'，或者移动端窄屏，导致 tooltip 超出外界被截断时，此配置比较有用。
             transitionDuration:0.4,//提示框浮层的移动动画过渡时间，单位是 s，设置为 0 的时候会紧跟着鼠标移动。
             formatter: item => {
-                  if(item.data.nature == '内容'){
-                     this.showTooltip(item)
-                     return this.lawContents;
-                    }
-                  return item ? item.name : '';  //showTooltip
+                  return item ? item.name : '';
                 },
             extraCssText:'background:red;white-space:pre-wrap'
+            
           },
-          legend: [{
-            selectedMode: 'single',
-              // data: categories.map(function (a) {
-              //     return a.name;
-              // })
-          }],
+          // legend: [{
+          //   selectedMode: 'single',
+          // }],
           legend: {
             data: []
           },
@@ -68,29 +56,21 @@
               saveAsImage: {show: true}
             }
           },
-          // legend: {
-          //   left: 'center',
-          //   top: 'top',
-          //   orient: 'horizontal',
-          //   data: tagLegends
-          // },
           backgroundColor: 'rgba(196, 196, 196, 0.1)',
           series: [{
-            type: 'graph',
-            // name : "法规知识图谱",  //系列名称，用于tooltip的显示，legend 的图例筛选，在 setOption 更新数据和配置项时用于指定对应的系列。
-            layout: 'force',//力引导布局
-            //  layout: 'circular',//环形布局
+            type: 'graphGL',
+            layout: 'forceAtlas2',//力引导布局
             animation: false,//是否开启动画。
             roam: true,//整体是否可拖动
             draggable: true,//节点是否可拖动
             focusNodeAdjacency: false,//关联节点高亮
+            hoverAnimation:false,  //是否开启鼠标 hover 节点的提示动画效果。
             symbol: 'circle',
             label: {
               normal: {
                 show: true,
                 formatter: item => {
-                  return item ? item.name.substr(0, 13) + '\n[' + 'weight' + ']:' + item.value : '';
-                  // return item ? item.name + '\n[' + item.data.nature + ']:' + item.value : '';
+                  return item ? item.name.substr(0, 13) : '';
                 },
                 textStyle: {
                   color: 'black',
@@ -101,16 +81,18 @@
               }
             },
             categories: [],//图谱顶部的分类
-            force: {//力引导布局
-              //initLayout: 'circular',
-              edgeLength: 160,
-              repulsion: 500,
-              layoutAnimation: true,//默认为true因为力引导布局会在多次迭代后才会稳定，这个参数决定是否显示布局的迭代动画，在浏览器端节点数据较多（>100）的时候不建议关闭，布局过程会造成浏览器假死。
-              // gravity: -0.05 // 不要引力，全部是斥力，让节点尽可能都相互排斥
+            forceAtlas2: {
+                GPU:false,
+                steps: 1,
+                stopThreshold: 0,
+                jitterTolerence: 10,
+                edgeWeight: [0.2, 1],
+                gravity: 0,
+                edgeWeightInfluence: 1,
+                scaling: 100,
+                repulsionByDegree:true,
+                preventOverlap:true
             },
-            // circular: {//环形布局
-            //         rotateLabel: true
-            // },
             data: [],
             links: []
           }]
@@ -176,51 +158,6 @@
             return '-';
         }
       },
-      handlePick(params) {
-        // 判断点击的是点还是连接线
-        switch (params.dataType) {
-          case 'node':
-            if (params.data.srcid) {
-              this.$emit('update:picknode', this.revNodes[params.data.srcid]);
-            }
-            break;
-          case 'edge':
-            if (params.data.srcid) {
-              this.$emit('update:picklink', this.revLinks[params.data.srcid]);
-            }
-            break;
-          default:
-            break;
-        }
-        console.log(params);
-      },
-      handleExtend(params) {
-        // 判断点击的是点还是连接线
-        switch (params.dataType) {
-          case 'node':
-            this.wordlist.push(params.data.name);
-            this.$http.get('/wizard/node/getNodeAndLinksById', {
-              params: {
-                id: params.data.srcid,
-                level: 1
-              }
-            }).then(res => {
-              res.data.forEach(word => {
-                this.revNodes[word.word] = word;
-              });
-              res.links.forEach(link => {
-                this.revLinks[link.id] = link;
-              });
-              this.generateGraph();
-            });
-            break;
-          case 'edge':
-            break;
-          default:
-            break;
-        }
-        console.log(params);
-      },
       showGraph() {
         // 这个方法是完全重新加载整张图
         if (this.wordlist && this.wordlist.length > 0) {
@@ -238,22 +175,6 @@
             });
             this.generateGraph();
           });
-        }
-      },
-      showTooltip(params){
-        if (params && params.name.length > 0) {
-          this.lawId = params.name.split('|')[0];
-          if(this.lawId.length==5){
-            this.$http.get('/law/get/' + this.lawId).then(res => {
-                this.$Notice.success({
-                  title: '从服务器加载分类成功'
-                });
-               this.lawContents = res.contents ? res.contents:'';
-              });
-          }else{
-            this.lawId = ''
-            this.lawContents = ''
-          }
         }
       },
       generateGraph() {
@@ -292,23 +213,19 @@
               link.symbol = null;
               link.symbolSize = null;
               link.lineStyle = {
-                normal: {
-                  color: 'rgba(255,33,33,' + link.weight / 0.6 + ')',
+                  color: 'rgba(255,33,33,1)',
                   opacity: 0.9,
                   width: 2,
                   // type:'dotted'  //线的类型可选：'solid' 'dashed' 'dotted'
-                }
               };
               break;
             case 'type':
               link.symbol = ['circle', 'arrow'];
               link.symbolSize = [3, 13];
               link.lineStyle = {
-                normal: {
-                  color: 'rgba(23,124,176, ' + link.weight / 0.6 + ')',
+                  color: 'rgba(23,124,176, 1)',
                   opacity: 1,
                   width: 2,
-                }
               };
               break;
             default:
@@ -318,11 +235,10 @@
             srcid: link.id,
             source: link.start,
             target: link.end,
-            value: this.switchCategorie(link.nature),
+            value: link.nature,
             label: {
               normal: {
                 show: true,
-                //formatter: '● {c}'
                 formatter: '{c}'
               }
             },
@@ -331,8 +247,6 @@
             lineStyle: link.lineStyle
           });
         }
-        console.log(JSON.stringify(this.option));
-        console.log(this.option);
         this.wordGraphShow.setOption(this.option);
         window.onresize = this.wordGraphShow.resize;
       },
@@ -340,10 +254,6 @@
     mounted() {
       this.wordGraphShow = echarts.init(document.getElementById('word_graph_all'));
       this.wordGraphShow.setOption(this.option);
-      // 加入单击pick事件
-      this.wordGraphShow.on('click', this.handlePick);
-      // 加入双击扩展显示事件
-      this.wordGraphShow.on('dblclick', this.handleExtend);
       this.showGraph();
     }
   };

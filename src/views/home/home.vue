@@ -46,14 +46,14 @@
       </Row>
       <Row class="margin-top-10">
         <Card :bordered="false"  dis-hover >
-              <div class="word-graph-div" style="height:800px" v-if="showGraph">
-                  <word-Graph v-if="showGraph"
-                              :wordlist="wordlist"
-                              :closemodal.sync="showGraph"
-                              :freshGraph.sync="freshGraph"
-                              :picknode.sync="pickNode"
-                              :picklink.sync="pickLink"/>
-              </div>
+            <div class="word-graph-div" style="height:800px" v-if="showGraph">
+                <word-Graph v-if="showGraph"
+                            :wordlist="wordlist"
+                            :closemodal.sync="showGraph"
+                            :freshGraph.sync="freshGraph"
+                            :picknode.sync="pickNode"
+                            :picklink.sync="pickLink"/>
+            </div>
         </Card>
       </Row>
       <Row class="margin-top-10">
@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import wordGraph from '../wizard/components/word-graph';
+import wordGraph from '../wizard/components/word-graph-home';
 import inforCard from "./components/inforCard.vue";
 import { formatFullDate } from "@/libs/filters";
 import serviceRequests from "./components/serviceRequests.vue";
@@ -77,7 +77,7 @@ export default {
   },
   data() {
     return {
-      wordlist: ['F0396', 'I0186','F0519'],
+      wordlist: ['F0396', 'I0186','F0519','发票管理'],
       showGraph: true,
       freshGraph: 0,
       pickNode: {},
