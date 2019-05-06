@@ -91,21 +91,20 @@
                                     <InputNumber :max="2" :min="0" :step="0.1" v-model="pickLink.weight"></InputNumber>
                                     <!--<i-input v-model="pickLink.weight"/>-->
                                 </FormItem>
-                                <FormItem label="注解">
-                                    <i-input v-model="pickLink.tip"/>
-                                </FormItem>
                                 <FormItem label="类型">
                                     <Row>
                                         <i-col span="8">
                                             <i-select v-model="pickLink.type">
-                                                <Option value="synonym">近义关系</Option>
-                                                <Option value="parent">父子关系</Option>
+                                                <Option value="attribute">属性关系</Option>
+                                                <Option value="type">分类关系</Option>
+                                                <Option value="item">条款关系</Option>
                                             </i-select>
                                         </i-col>
                                         <i-col span="12" style="margin-left: 5px;">
                                             <RadioGroup v-model="pickLink.type">
-                                                <Radio label="synonym"></Radio>
+                                                <Radio label="attribute"></Radio>
                                                 <Radio label="parent"></Radio>
+                                                <Radio label="item"></Radio>
                                             </RadioGroup>
                                         </i-col>
                                     </Row>
@@ -135,21 +134,20 @@
                                     <InputNumber :max="2" :min="0" :step="0.1" v-model="addLink.weight"></InputNumber>
                                     <!--<i-input v-model="addLink.weight"/>-->
                                 </FormItem>
-                                <FormItem label="注解">
-                                    <i-input v-model="addLink.tip"/>
-                                </FormItem>
                                 <FormItem label="类型">
                                     <Row>
                                         <i-col span="8">
                                             <i-select v-model="addLink.type">
-                                                <Option value="synonym">近义关系</Option>
-                                                <Option value="parent">父子关系</Option>
+                                                <Option value="attribute">属性关系</Option>
+                                                <Option value="type">分类关系</Option>
+                                                <Option value="item">条款关系</Option>
                                             </i-select>
                                         </i-col>
                                         <i-col span="12" style="margin-left: 5px;">
                                             <RadioGroup v-model="addLink.type">
-                                                <Radio label="synonym"></Radio>
+                                                <Radio label="attribute"></Radio>
                                                 <Radio label="parent"></Radio>
+                                                <Radio label="item"></Radio>
                                             </RadioGroup>
                                         </i-col>
                                     </Row>
@@ -191,10 +189,9 @@
                             </Form>
                         </TabPane>
                         <TabPane label="帮助" name="tabLinkHelp">
-                            <Alert>节点的编号是根据首尾节点自动生成的</Alert>
+                            <Alert>节点的编号是自动生成的</Alert>
                             <Alert>如果该连线不要了，请删掉该连线，不要修改这个连线的起点和终点</Alert>
-                            <Alert type="warning">两个点之间关系只能有一种，要么父子、要么近义</Alert>
-                            <Alert>父子关系是父指向子，近义关系没有方向</Alert>
+                            <Alert type="warning">两个点之间关系目前支持三种</Alert>
                         </TabPane>
                     </Tabs>
                 </Card>
@@ -209,20 +206,9 @@
                     <Button slot="extra" type="warning" shape="circle" @click="clearPickedWord">
                         清空
                     </Button>
-                    <Button slot="extra" type="error" shape="circle" @click="mergeGraphToDictionary">
-                        更新问答库
-                    </Button>
                     <Form :label-width="50">
                         <FormItem label="导入" v-show="showRestoreProgress">
                             <Progress :percent="restoreProgress" status="active"></Progress>
-                        </FormItem>
-                        <FormItem label="问答">
-                            <i-input v-model="questioninput" @on-enter="handleAddQuestion">
-                                <Button slot="append" @click="handleAddQuestion">
-                                    提交
-                                </Button>
-                            </i-input>
-                            <i-input type="text" style="display:none"/>
                         </FormItem>
                         <FormItem label="添加词">
                             <i-input v-model="wordinput" @on-enter="handleAddWord">
@@ -265,7 +251,7 @@
     },
     data() {
       return {
-        wordlist: ['F0396', 'I0186','F0519'],
+        wordlist: ['F0396', 'S0494','F0519'],
         wordinput: '',
         questioninput: '',
         pickNode: {},
@@ -301,14 +287,6 @@
       handleAddWord() {
         this.wordlist.push(this.wordinput);
         this.wordinput = '';
-      },
-      handleAddQuestion() {
-        this.$http.get('/dict/termAnalysis', {params: {question: this.questioninput, expand: false}}).then(res => {
-          this.wordlist = res.map(word => word.name);
-          this.$Notice.success({
-            title: '已获取最新数据'
-          });
-        });
       },
       handleWordClose(event, name) {
         const index = this.wordlist.indexOf(name);
@@ -466,41 +444,6 @@
           this.freshGraph++;
         });
       },
-      checkRestoreProgress() {
-        setTimeout(() => {
-          this.$http.get('/wizard/node/getRestoreProgress').then(res => {
-            this.restoreProgress = res;
-            if (res === 100) {
-              setTimeout(() => {
-                this.showRestoreProgress = false;
-              }, 10000);
-            } else {
-              this.checkRestoreProgress();
-            }
-          });
-        }, 1000);
-      },
-      mergeGraphToDictionary() {
-        this.$Modal.confirm({
-          title: "请确认更新问答词库",
-          content: "该过程会清空现有所有在问答词库下的配置重新生成，该过程也会更新智能问答权重词典，生成过程大概需要30秒左右，生成完毕后会有提示，过程中请不要再次点击，确认生成请点击确认",
-          okText: '确认',
-          cancelText: '取消',
-          onOk: () => {
-            this.showRestoreProgress = true;
-            this.checkRestoreProgress();
-            this.$http.get('/wizard/node/man/restoreAllWordsToRobotDictionary', {params: {clearAll: true}}).then(res => {
-              this.$Message.success({
-                content: '更新完毕' + res,
-                duration: 10
-              });
-            });
-          },
-          onCancel: () => {
-            this.$Modal.remove();
-          }
-        });
-      }
     },
     computed: {
       graphDivStyle: function () {
@@ -517,7 +460,7 @@
         }
       },
       pickNode(newVal, oldVal) {
-        this.toDeleteLinkNode = newVal.id;
+        this.toDeleteLinkNode = newVal.word;
       }
     },
     created() {

@@ -5,6 +5,7 @@
 
 <script>
   import echarts from 'echarts';
+  import jQuery from "jquery"
 
   export default {
     name: 'wordGraph',
@@ -16,11 +17,7 @@
         revLinks: {},
         lawId:'',
         lawContents:'',
-        // timer: [],
-        // tempLinks: [],
-        // tempData: [],
-        // switch:false,
-        // counter:0,
+        lawItems:'',
         option: {
           title: {
             text: '知识图谱',
@@ -43,19 +40,42 @@
             confine:false,//是否将 tooltip 框限制在图表的区域内。外层的 dom 被设置为 'overflow: hidden'，或者移动端窄屏，导致 tooltip 超出外界被截断时，此配置比较有用。
             transitionDuration:0.4,//提示框浮层的移动动画过渡时间，单位是 s，设置为 0 的时候会紧跟着鼠标移动。
             formatter: item => {
-                  if(item.data.nature == '内容'){
-                     this.showTooltip(item)
-                     return this.lawContents;
-                    }
-                  return item ? item.name : '';  //showTooltip
-                },
+              if(item.data.nature == '内容'){
+                  // this.showTooltipContents(item)
+                  if (item && item.name.length > 0) {
+                  this.lawId = item.name.split('|')[0];
+                  if(this.lawId.length==5){
+                    jQuery.ajaxSettings.async = false;
+                    jQuery.get('http://localhost:18070/kg/v1/b/law/get/' + this.lawId, res =>{
+                      let resData = JSON.parse(res);
+                      this.$Notice.success({
+                        title: '从服务器加载分类成功'
+                      });
+                      this.lawContents = resData.data.contents ? resData.data.contents :'';
+                    })
+                    return this.lawContents;
+                }
+               }
+              }
+              if(item.data.nature == '条款'){
+                  if(item.name != '' && item.name.length > 0){
+                    jQuery.ajaxSettings.async = false;
+                    jQuery.get('http://localhost:18070/kg/v1/b/lawitem/get/' + item.name, res =>{
+                      let resData = JSON.parse(res);
+                      this.$Notice.success({
+                        title: '从服务器加载分类成功'
+                      });
+                      this.lawItems = resData.data.item ? resData.data.item :'';
+                    })
+                    return this.lawItems;
+                  }
+                }
+                return item ? item.name : '';  
+            },
             extraCssText:'background:red;white-space:pre-wrap'
           },
           legend: [{
             selectedMode: 'single',
-              // data: categories.map(function (a) {
-              //     return a.name;
-              // })
           }],
           legend: {
             data: []
@@ -79,7 +99,6 @@
             type: 'graph',
             // name : "法规知识图谱",  //系列名称，用于tooltip的显示，legend 的图例筛选，在 setOption 更新数据和配置项时用于指定对应的系列。
             layout: 'force',//力引导布局
-            //  layout: 'circular',//环形布局
             animation: false,//是否开启动画。
             roam: true,//整体是否可拖动
             draggable: true,//节点是否可拖动
@@ -102,15 +121,11 @@
             },
             categories: [],//图谱顶部的分类
             force: {//力引导布局
-              //initLayout: 'circular',
-              edgeLength: 160,
+              edgeLength: 120,
               repulsion: 500,
               layoutAnimation: true,//默认为true因为力引导布局会在多次迭代后才会稳定，这个参数决定是否显示布局的迭代动画，在浏览器端节点数据较多（>100）的时候不建议关闭，布局过程会造成浏览器假死。
               // gravity: -0.05 // 不要引力，全部是斥力，让节点尽可能都相互排斥
             },
-            // circular: {//环形布局
-            //         rotateLabel: true
-            // },
             data: [],
             links: []
           }]
@@ -173,7 +188,7 @@
           case 'no':
             return '发文号';
           default:
-            return '-';
+            return '条款';
         }
       },
       handlePick(params) {
@@ -240,22 +255,6 @@
           });
         }
       },
-      showTooltip(params){
-        if (params && params.name.length > 0) {
-          this.lawId = params.name.split('|')[0];
-          if(this.lawId.length==5){
-            this.$http.get('/law/get/' + this.lawId).then(res => {
-                this.$Notice.success({
-                  title: '从服务器加载分类成功'
-                });
-               this.lawContents = res.contents ? res.contents:'';
-              });
-          }else{
-            this.lawId = ''
-            this.lawContents = ''
-          }
-        }
-      },
       generateGraph() {
         // 这个方法是只按照当前的点集展示图形
         this.option.series[0].data = [];
@@ -318,7 +317,7 @@
             srcid: link.id,
             source: link.start,
             target: link.end,
-            value: this.switchCategorie(link.nature),
+            value: this.switchCategorie(link.nature)=="条款" ? link.nature:this.switchCategorie(link.nature),
             label: {
               normal: {
                 show: true,
@@ -331,8 +330,8 @@
             lineStyle: link.lineStyle
           });
         }
-        console.log(JSON.stringify(this.option));
-        console.log(this.option);
+        // console.log(JSON.stringify(this.option));
+        // console.log(this.option);
         this.wordGraphShow.setOption(this.option);
         window.onresize = this.wordGraphShow.resize;
       },
