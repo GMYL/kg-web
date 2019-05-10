@@ -26,6 +26,7 @@
                                 </span>
                             </i-input>
                         </FormItem>
+                        <p>游客账号admin  密码admin</p>
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
@@ -60,7 +61,11 @@
                 title: '登陆成功',
                 desc: '欢迎' + res.userName
               });
-              this.$router.push({name: 'home_index'});
+              if( this.form.userName == "admin"){
+                this.$router.push({name: 'show_list'});
+              }else{
+                this.$router.push({name: 'home_index'});
+              }
             });
           }
         });

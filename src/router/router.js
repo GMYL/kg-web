@@ -84,7 +84,7 @@ export const appRouter = [
   {
     path: "/backend",
     icon: "ios-home",
-    // name: 'backend',
+    name: 'backend',
     title: "首页",
     component: Main,
     children: [
@@ -95,6 +95,24 @@ export const appRouter = [
         name: "home_index",
         component: resolve => {
           require(["@/views/home/home"], resolve);
+        }
+      }
+    ]
+  },
+  {
+    path: "/show",
+    icon: "ios-home",
+    name: 'show',
+    title: "图谱展示",
+    component: Main,
+    children: [
+      {
+        path: "list",
+        icon: "ios-home",
+        title: "图谱展示",
+        name: "show_list",
+        component: resolve => {
+          require(["@/views/show/list"], resolve);
         }
       }
     ]
@@ -123,15 +141,15 @@ export const appRouter = [
           require(["@/views/wizard/graph"], resolve);
         }
       },
-      {
-        path: "groot",
-        icon: "ios-color-filter",
-        title: "新版知识图谱",
-        name: "wizard_groot",
-        component: resolve => {
-          require(["@/views/wizard/groot"], resolve);
-        }
-      }
+      // {
+      //   path: "groot",
+      //   icon: "ios-color-filter",
+      //   title: "新版知识图谱",
+      //   name: "wizard_groot",
+      //   component: resolve => {
+      //     require(["@/views/wizard/groot"], resolve);
+      //   }
+      // }
     ]
   },
   {
@@ -246,35 +264,35 @@ export const appRouter = [
           require(["@/views/wizard/graph"], resolve);
         }
       },
-      {
-        path: "groot",
-        icon: "ios-color-filter",
-        title: "新版知识图谱",
-        name: "wizard_groot",
-        component: resolve => {
-          require(["@/views/wizard/groot"], resolve);
-        }
-      }
+      // {
+      //   path: "groot",
+      //   icon: "ios-color-filter",
+      //   title: "新版知识图谱",
+      //   name: "wizard_groot",
+      //   component: resolve => {
+      //     require(["@/views/wizard/groot"], resolve);
+      //   }
+      // }
     ]
   },
-      {
-        path: "api",
-        icon: "earth",
-        title: "接口调用情况",
-        name: "system_api",
-        component: resolve => {
-          require(["@/views/system/api"], resolve);
-        }
-      },
-      {
-        path: "search",
-        icon: "magnet",
-        title: "搜索引擎状况",
-        name: "system_search",
-        component: resolve => {
-          require(["@/views/system/search"], resolve);
-        }
-      },
+      // {
+      //   path: "api",
+      //   icon: "earth",
+      //   title: "接口调用情况",
+      //   name: "system_api",
+      //   component: resolve => {
+      //     require(["@/views/system/api"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "search",
+      //   icon: "magnet",
+      //   title: "搜索引擎状况",
+      //   name: "system_search",
+      //   component: resolve => {
+      //     require(["@/views/system/search"], resolve);
+      //   }
+      // },
       {
         path: "infolog",
         icon: "planet",
@@ -302,51 +320,51 @@ export const appRouter = [
           require(["@/views/system/backup"], resolve);
         }
       },
-      {
-        path: "report-lawdist",
-        icon: "clipboard",
-        title: "法规库数据统计",
-        name: "system_report_lawdist",
-        component: resolve => {
-          require(["@/views/system/report-lawdist"], resolve);
-        }
-      },
-      {
-        path: "report-qadist",
-        icon: "clipboard",
-        title: "问答库数据统计",
-        name: "system_report_qadist",
-        component: resolve => {
-          require(["@/views/system/report-qadist"], resolve);
-        }
-      },
-      {
-        path: "report-articledist",
-        icon: "clipboard",
-        title: "文章库数据统计",
-        name: "system_report_articledist",
-        component: resolve => {
-          require(["@/views/system/report-articledist"], resolve);
-        }
-      },
-      {
-        path: "report-graphdist",
-        icon: "clipboard",
-        title: "知识图谱数据统计",
-        name: "system_report_graphdist",
-        component: resolve => {
-          require(["@/views/system/report-graphdist"], resolve);
-        }
-      },
-      {
-        path: "report-workflowdist",
-        icon: "clipboard",
-        title: "业务数据统计",
-        name: "system_report_workflowdist",
-        component: resolve => {
-          require(["@/views/system/report-workflowdist"], resolve);
-        }
-      }
+      // {
+      //   path: "report-lawdist",
+      //   icon: "clipboard",
+      //   title: "法规库数据统计",
+      //   name: "system_report_lawdist",
+      //   component: resolve => {
+      //     require(["@/views/system/report-lawdist"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "report-qadist",
+      //   icon: "clipboard",
+      //   title: "问答库数据统计",
+      //   name: "system_report_qadist",
+      //   component: resolve => {
+      //     require(["@/views/system/report-qadist"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "report-articledist",
+      //   icon: "clipboard",
+      //   title: "文章库数据统计",
+      //   name: "system_report_articledist",
+      //   component: resolve => {
+      //     require(["@/views/system/report-articledist"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "report-graphdist",
+      //   icon: "clipboard",
+      //   title: "知识图谱数据统计",
+      //   name: "system_report_graphdist",
+      //   component: resolve => {
+      //     require(["@/views/system/report-graphdist"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "report-workflowdist",
+      //   icon: "clipboard",
+      //   title: "业务数据统计",
+      //   name: "system_report_workflowdist",
+      //   component: resolve => {
+      //     require(["@/views/system/report-workflowdist"], resolve);
+      //   }
+      // }
     ]
   }
 ];

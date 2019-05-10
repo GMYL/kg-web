@@ -13,8 +13,10 @@
                     :i-width="iWidth"
                     :menu-list="menuList">
                 <div slot="top" class="logo-con">
-                    <img v-show="!shrink" src="../images/logo.png" style="width:80%;height:80%;" key="max-logo"/>
-                    <img v-show="shrink" src="../images/logo-min.png" style="width:80%;height:80%;" key="min-logo"/>
+                    <!-- <img v-show="!shrink" src="../images/logo.png" style="width:80%;height:80%;" key="max-logo"/>
+                    <img v-show="shrink" src="../images/logo-min.png" style="width:80%;height:80%;" key="min-logo"/> -->
+                    <img v-show="!shrink" src="../images/kg.png" style="width:80%;height:80%;" key="max-logo"/>
+                    <img v-show="shrink" src="../images/kg-min.png" style="width:80%;height:80%;" key="min-logo"/>
                 </div>
             </shrinkable-menu>
         </div>

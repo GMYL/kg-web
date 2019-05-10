@@ -37,60 +37,59 @@ const app = {
     setTagsList(state, list) {
       state.tagsList.push(...list);
     },
-    updateMenulist(state) {
+    updateMenulist(state) {//页面控制
       let accessCode = parseInt(Cookies.get('access'));
       let menuList = [];
-      console.log("9999999999999999:"+appRouter)
-      // let userModules = sessionStorage.userModules ? sessionStorage.userModules.split(",").map(item => item.substring(3)) : [];
-      let userModules = ["article"];
+      let userModules = sessionStorage.userModules ? sessionStorage.userModules.split(",").map(item => item.substring(3)) : [];
+      // let userModules = ["article"];
       appRouter.forEach((item, index) => {
-        menuList.push(item);
+        // menuList.push(item);//解开后所有页面都可以访问
 
-        // if (userModules.indexOf(item.name) > -1) {
-        //   if (item.access !== undefined) {
-        //     if (Util.showThisRoute(item.access, accessCode)) {
-        //       if (item.children.length === 1) {
-        //         menuList.push(item);
-        //       } else {
-        //         let len = menuList.push(item);
-        //         let childrenArr = [];
-        //         childrenArr = item.children.filter(child => {
-        //           if (child.access !== undefined) {
-        //             if (child.access === accessCode) {
-        //               return child;
-        //             }
-        //           } else {
-        //             return child;
-        //           }
-        //         });
-        //         menuList[len - 1].children = childrenArr;
-        //       }
-        //     }
-        //   } else {
-        //     if (item.children.length === 1) {
-        //       menuList.push(item);
-        //     } else {
-        //       let len = menuList.push(item);
-        //       let childrenArr = [];
-        //       childrenArr = item.children.filter(child => {
-        //         if (child.access !== undefined) {
-        //           if (Util.showThisRoute(child.access, accessCode)) {
-        //             return child;
-        //           }
-        //         } else {
-        //           return child;
-        //         }
-        //       });
-        //       if (childrenArr === undefined || childrenArr.length === 0) {
-        //         menuList.splice(len - 1, 1);
-        //       } else {
-        //         let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
-        //         handledItem.children = childrenArr;
-        //         menuList.splice(len - 1, 1, handledItem);
-        //       }
-        //     }
-        //   }
-        // }
+        if (userModules.indexOf(item.name) > -1) {
+          if (item.access !== undefined) {
+            if (Util.showThisRoute(item.access, accessCode)) {
+              if (item.children.length === 1) {
+                menuList.push(item);
+              } else {
+                let len = menuList.push(item);
+                let childrenArr = [];
+                childrenArr = item.children.filter(child => {
+                  if (child.access !== undefined) {
+                    if (child.access === accessCode) {
+                      return child;
+                    }
+                  } else {
+                    return child;
+                  }
+                });
+                menuList[len - 1].children = childrenArr;
+              }
+            }
+          } else {
+            if (item.children.length === 1) {
+              menuList.push(item);
+            } else {
+              let len = menuList.push(item);
+              let childrenArr = [];
+              childrenArr = item.children.filter(child => {
+                if (child.access !== undefined) {
+                  if (Util.showThisRoute(child.access, accessCode)) {
+                    return child;
+                  }
+                } else {
+                  return child;
+                }
+              });
+              if (childrenArr === undefined || childrenArr.length === 0) {
+                menuList.splice(len - 1, 1);
+              } else {
+                let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
+                handledItem.children = childrenArr;
+                menuList.splice(len - 1, 1, handledItem);
+              }
+            }
+          }
+        }
       });
       state.menuList = menuList;
     },

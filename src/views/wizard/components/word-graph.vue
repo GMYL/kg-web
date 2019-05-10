@@ -46,7 +46,7 @@
                   this.lawId = item.name.split('|')[0];
                   if(this.lawId.length==5){
                     jQuery.ajaxSettings.async = false;
-                    jQuery.get('http://localhost:18070/kg/v1/b/law/get/' + this.lawId, res =>{
+                    jQuery.get('http://www.aqielu.cn/kg/v1/b/law/get/' + this.lawId, res =>{
                       let resData = JSON.parse(res);
                       this.$Notice.success({
                         title: '从服务器加载分类成功'
@@ -60,7 +60,7 @@
               if(item.data.nature == '条款'){
                   if(item.name != '' && item.name.length > 0){
                     jQuery.ajaxSettings.async = false;
-                    jQuery.get('http://localhost:18070/kg/v1/b/lawitem/get/' + item.name, res =>{
+                    jQuery.get('http://www.aqielu.cn/kg/v1/b/lawitem/get/' + item.name, res =>{
                       let resData = JSON.parse(res);
                       this.$Notice.success({
                         title: '从服务器加载分类成功'

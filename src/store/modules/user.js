@@ -109,14 +109,14 @@ const user = {
         $http.post('/auth/token/login', payload).then(res => {
           // sessionStorage.token = res.jwtToken;
           // localStorage.user = JSON.stringify(res);
-          if (res != null && res.roles != null && res.roles.indexOf('role_system') !== -1) {
+          // if (res != null && res.roles != null && res.roles.indexOf('role_system') !== -1) {
             sessionStorage.hbtoken = res.jwtToken;
             sessionStorage.user = JSON.stringify(res);
             commit('set_user', res);
             // 从服务器调用初始化的数据
             // dispatch('init_module_sys');
             resolve(res);
-          }
+          // }
         }).catch(err => [
           console.log(err)
         ]);
