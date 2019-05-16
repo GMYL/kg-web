@@ -234,6 +234,78 @@ export const appRouter = [
     ]
   },
   {
+    path: "/robot",
+    icon: "social-octocat",
+    name: "robot",
+    title: "字典管理",
+    component: Main,
+    children: [
+      // {
+      //   path: "status",
+      //   icon: "ios-analytics-outline",
+      //   title: "运行状态",
+      //   name: "robot_status",
+      //   component: resolve => {
+      //     require(["@/views/robot/status"], resolve);
+      //   }
+      // },
+      // {
+      //   path: 'rank',
+      //   icon: 'ios-pie-outline',
+      //   title: '词出现次数排序',
+      //   name: 'robot_rank',
+      //   component: resolve => {
+      //     require(['@/views/robot/rank'], resolve);
+      //   }
+      // },
+      {
+        path: "dict",
+        icon: "ios-keypad",
+        title: "扩展词典",
+        name: "robot_dict",
+        component: resolve => {
+          require(["@/views/robot/dict"], resolve);
+        }
+      },
+      {
+        path: "stopdict",
+        icon: "ios-keypad",
+        title: "停用词典",
+        name: "robot_stopdict",
+        component: resolve => {
+          require(["@/views/robot/stopdict"], resolve);
+        }
+      },
+      // {
+      //   path: "dictUpload",
+      //   icon: "android-upload",
+      //   title: "扩展词典上传",
+      //   name: "robot_dictUpload",
+      //   component: resolve => {
+      //     require(["@/views/robot/dictUpload"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "stopdictUpload",
+      //   icon: "android-upload",
+      //   title: "停用词典上传",
+      //   name: "robot_stopdictUpload",
+      //   component: resolve => {
+      //     require(["@/views/robot/stopdictUpload"], resolve);
+      //   }
+      // },
+      // {
+      //   path: "term",
+      //   icon: "ios-settings-strong",
+      //   title: "term分析",
+      //   name: "robot_term",
+      //   component: resolve => {
+      //     require(["@/views/robot/term"], resolve);
+      //   }
+      // }
+    ]
+  },
+  {
     path: "/system",
     icon: "android-boat",
     name: "system",

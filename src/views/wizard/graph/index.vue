@@ -91,6 +91,9 @@
                                     <InputNumber :max="2" :min="0" :step="0.1" v-model="pickLink.weight"></InputNumber>
                                     <!--<i-input v-model="pickLink.weight"/>-->
                                 </FormItem>
+                                <FormItem label="关系属性" disabled>
+                                    <i-input v-model="pickLink.nature"/>
+                                </FormItem>
                                 <FormItem label="类型">
                                     <Row>
                                         <i-col span="8">
@@ -133,6 +136,9 @@
                                 <FormItem label="权重">
                                     <InputNumber :max="2" :min="0" :step="0.1" v-model="addLink.weight"></InputNumber>
                                     <!--<i-input v-model="addLink.weight"/>-->
+                                </FormItem>
+                                <FormItem label="关系属性">
+                                    <i-input v-model="addLink.nature"/>
                                 </FormItem>
                                 <FormItem label="类型">
                                     <Row>
