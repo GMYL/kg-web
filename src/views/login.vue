@@ -26,10 +26,11 @@
                                 </span>
                             </i-input>
                         </FormItem>
-                        <p>游客账号admin  密码admin</p>
+                        <p>游客账号:admin  密码:admin</p>
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
+                        <p>若登陆反应，系统正在更新维护</p>
                     </Form>
                 </div>
             </Card>
