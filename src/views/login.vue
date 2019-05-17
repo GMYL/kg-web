@@ -30,7 +30,7 @@
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
-                        <p>若登陆反应，系统正在更新维护</p>
+                        <p>若登陆无反应，系统正在更新维护</p>
                     </Form>
                 </div>
             </Card>
