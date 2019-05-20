@@ -61,7 +61,7 @@ module.exports = merge(webpackBaseConfig, {
     // }),
     new CopyWebpackPlugin([
       {
-        from: 'huaban.ico'
+        from: 'kg.ico'
       },
       {
         from: 'src/styles/fonts',
@@ -83,14 +83,14 @@ module.exports = merge(webpackBaseConfig, {
     }),
     // new HtmlWebpackPlugin({
     //   title: '花瓣工作台',
-    //   favicon: './huaban.ico',
+    //   favicon: './kg.ico',
     //   filename: '../index.html',
     //   template: '!!ejs-loader!./src/template/index.ejs',
     //   inject: false
     // })
     new HtmlWebpackPlugin({
       title: '法规知识图谱',
-      favicon: './huaban.ico',
+      favicon: './kg.ico',
       filename: '../index.html',
       template: '!!ejs-loader!./src/template/index.ejs',
       inject: 'body',

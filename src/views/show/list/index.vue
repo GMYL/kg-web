@@ -7,6 +7,9 @@
                         <Icon type="ios-list-outline"></Icon>
                         添加关键词
                     </p>
+                    <Button slot="extra" type="primary" shape="circle" @click="createFileTxt">
+                        导出图中法规关键字
+                    </Button>
                     <Button slot="extra" type="success" shape="circle"  @click="showGraphClick">
                         显示
                     </Button>
@@ -133,6 +136,17 @@
       },
       showGraphClick() {
         this.freshGraph++;
+      },
+      createFileTxt() {
+        if (this.wordlist && this.wordlist.length > 0) {
+          this.$http.post('/wizard/node/downFileTxt', this.wordlist).then(res => {
+            this.$Notice.success({
+              title: '导出法规关键词成功'
+            });
+          window.open("http://www.aqielu.cn/kg/static/download/laws.txt", '_blank');
+          //  window.open(res.data, '_blank');
+          });
+        }
       },
       submitNodeUpdate() {
         this.$http.post('/wizard/node/update', this.pickNode).then(() => {
